@@ -1,0 +1,2 @@
+PIP_INDEX_URL=https://mirrors.aliyun.com/pypi/simple/
+UPGRADE_PIP_TO_LATEST=True

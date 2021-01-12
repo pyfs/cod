@@ -1,0 +1,15 @@
+# 告警事件任务状态
+
+STATUS_NO_RESPONSE = 'NO_RESPONSE'  # 未响应, 事件创建成功的一个初始状态
+STATUS_PROCESSING = 'PROCESSING'  # 处理中
+STATUS_RESOLVED = 'RESOLVED'  # 已解决
+STATUS_REVOKED = 'REVOKED'  # 撤销, 手动操作撤销和关闭的时间
+STATUS_TIMEOUT = 'TIMEOUT'  # 超时关闭，基于数据源定义的时间关闭事件
+
+# 需要升级的告警状态
+STATUS_NEED_UPGRADE = [STATUS_NO_RESPONSE]
+
+# 未关闭事件列表(未响应，处理中的两类事件)
+STATUS_NOT_CLOSED = [STATUS_NO_RESPONSE, STATUS_PROCESSING]
+
+
