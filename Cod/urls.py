@@ -28,6 +28,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('mdeditor/', include('mdeditor.urls')),
     path('docs/', include('docs.urls')),
+    path('watchman/', include('watchman.urls')),
 ]
 
 # 自研 APP 路由
