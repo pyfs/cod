@@ -41,6 +41,7 @@ INSTALLED_APPS += [
     'django.contrib.sites',
     'mptt',
     'docs',
+    'watchman',
 ]
 
 INSTALLED_APPS += [
