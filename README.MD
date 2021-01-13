@@ -1,11 +1,73 @@
-项目: Cod
-维护: peizhenfei
-邮箱: peizhenfei@cvte.com
+# :alarm_clock: Call of Duty 使命召唤
 
-> ### 项目简介
-基于告警消息收敛为事件，以其为核心进行多维度的策略管制的告警平台。
+接收告警消息并根据收敛策略合并为事件，并围绕告警事件，在告警产生和告警到达之间展开业务逻辑。
+减少重复告警消息的打扰，让每条告警都得到处理！
 
-## 环境变量设置
+无监控，不运维；无告警，很开心！
+
+# :construction_worker: 项目维护
+项目管理: 裴振飞
+
+项目主程: 刘生华，简佳俊，裴振飞
+
+联系邮箱: peizhenfei@cvte.com
+
+# :rocket: 项目进度
+
+
+```mermaid
+gantt
+    title COD 项目规划进度 2021-01 ~ 2021-03
+    dateFormat  YYYY-MM-DD
+    excludes Saturdayt, Sunday
+    todayMarker stroke-width:5px,opacity:0.7
+
+    section 后端开发
+    健康日报功能开发    :report, 2020-12-05, 2021-01-30
+
+    section 部署支持
+    s2i-python-container   :s2i-python-container, 2021-01-04, 2021-01-08
+    CICD 优化   :after s2i-python-container, 2021-01-31
+
+    section 文档补全
+    安装部署文档    :active, 2021-01-13, 2021-01-31
+    核心代码逻辑文档    :code, 2021-02-01, 2021-02-28
+    使用说明文档    :after code, 2021-03-31
+    
+    section 开源进度
+    去掉单点登录及发送通道  :opensource, 2021-03-01, 2021-03-31
+```
+
+<details>
+<summary>COD 项目规划进度: 2020-11 ~ 2020-12</summary>
+
+```mermaid
+gantt
+    title COD 项目规划进度 2020-11 ~ 2020-12
+    dateFormat  YYYY-MM-DD
+    excludes Saturdayt, Sunday
+    todayMarker stroke-width:5px,opacity:0.7
+
+    section 后端开发
+    主逻辑上线 V1.0    :masterv1, 2020-10-26, 2020-11-30
+    上线后异常处理      :after masterv1, 2020-12-30
+    对接 Prometheus，鲸云，Zabbix 等    :datasource, 2020-11-01, 2020-11-29
+    健康日报功能开发    :report, 2020-12-05, 2020-12-30
+
+    section 部署支持
+    kubesphere 2.2.1 升级到 3.1.0   :ksv2->v3, 2020-11-05,2020-11-20
+    s2i-centos-django   :s2i-centos-django, 2020-11-18, 2020-11-28
+    CICD 优化   :after s2i-centos-django, 2020-12-30
+```
+
+</details>
+
+
+# 项目部署
+
+- [ ] 部署文档待补全
+
+# :speech_balloon: 环境变量说明
 
 ```
 # cat .envrc
@@ -19,37 +81,10 @@ export DB_USERNAME=!!!data-base-user-name!!!
 export DB_PASSWORD=!!!data-base-password!!!
 ```
 
-## 初始化开发环境
-根目录下面有一个Makefile文件，具体详情可以看里面写了什么。初始化环境需要执行如下命令：
-> make clean  &&  make make
-> 提示设置管理员的密码
+# :beer: 参与开发
 
-## 配置rabbitmq
-> 进入项目目录里面的docker-compose/rabbitmq  
-> 启动rabbitmq环境 docker-compose up -d
+- [ ] 开发文档待补全
 
+# :question: 如有疑问
 
-## 业务环境配置操作指引
-### 1、增加数据源
-### 2、增加密钥
-### 3、增加项目
-### 4、推送消息到接口调试
-#### 推送消息测试用
-
-```bash
-#!/bin/bash
-NUB=$3
-STA=$2
-PRO=$1
-NOWTIME=`date '+%Y-%m-%d %H:%M:%S'`
-#type=HostHighCpuLoad
-curl --location --request POST 'http://127.0.0.1:8000/api/v1/message/restapi/?token=f24be027127a47c989971743a1601406' \
---form "project=$1" \
---form "type=HostHighCpuLoad" \
---form "host=10.20.30.$NUB" \
---form "title=MemoryVeryHight 10.22.23.$NUB" \
---form "level=0" \
---form "status=$STA" \
---form "created=$NOWTIME"
-```
-> sh push_msg.sh CLOUD alert 16
+任何疑问，可直接提 ISSUE 给我们，描述清楚问题，我们会尽快给予回复！
