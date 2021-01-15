@@ -385,7 +385,7 @@ def handle_message_recover(message: Message) -> None:
     处理异常告警恢复
     :param message: 当前事件消息
     """
-    events = Event.objects.filter(project__name=message.project, host=message.host, type=message.type,
+    events = Event.objects.filter(project__label=message.project, host=message.host, type=message.type,
                                   status__in=STATUS_NOT_CLOSED)
     recovery_event_obj = events.order_by('level').last()
     if recovery_event_obj:
