@@ -38,7 +38,7 @@ class Command(BaseCommand):
         # 获取产品线，产品的名字
         product_line_name, product_name = project_name.split('_')
         try:
-            product_line = Project.objects.get(name=product_line_name)
+            product_line = Project.objects.get(label=product_line_name)
             product_line.parent = None
             product_line.save()
         except Project.DoesNotExist:
@@ -49,7 +49,7 @@ class Command(BaseCommand):
 
         # 创建产品
         try:
-            product = Project.objects.get(name=product_name)
+            product = Project.objects.get(label=product_name)
             product.parent = product_line
             product.save()
         except Project.DoesNotExist:
@@ -60,7 +60,7 @@ class Command(BaseCommand):
 
         # 创建项目
         try:
-            project = Project.objects.get(name=project_name)
+            project = Project.objects.get(label=project_name)
             project.parent = product
             project.save()
         except Project.DoesNotExist:
@@ -82,9 +82,9 @@ class Command(BaseCommand):
 
     def create_converge(self, project_name):
         # 项目名字project_name: 格式 INFRA_CCLOUD
-        project = Project.objects.get(name=project_name)
+        project = Project.objects.get(label=project_name)
         try:
-            BurrConverge.objects.get(name=project_name)
+            BurrConverge.objects.get(label=project_name)
         except BurrConverge.DoesNotExist:
             BurrConverge.objects.update_or_create(status=STATUS_PUBLISHED,
                                                   name=project_name,
@@ -93,7 +93,7 @@ class Command(BaseCommand):
     def create_delivery(self, project_name, user):
         # 项目名字project_name: 格式 INFRA_CCLOUD
         # 获取产品关联的主要负责人信息 project_pic
-        project = Project.objects.get(name=project_name)
+        project = Project.objects.get(label=project_name)
         try:
             delivery = Delivery.objects.get(name=project_name)
         except Delivery.DoesNotExist:
