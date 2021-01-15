@@ -28,20 +28,20 @@ class Command(BaseCommand):
     @staticmethod
     def check_no_receivers(project_name):
         """ 检查项目所有事件里面，没有关联发送人员的事件，此类事件则是没有发送通知给到关联人员"""
-        project = Project.objects.get(name=project_name)
+        project = Project.objects.get(label=project_name)
         events = Event.objects.filter(project=project).order_by("created")
         print("*****************搜索项目里面事件没有关联接收人员的事件列表******************")
         for event in events:
             if not event.receivers.all():
                 print('时间:{0}, 事件ID:{1}, 项目名称:{2}, 分派策略:{3}'.format(event.modified, event.id,
-                                                                    event.project.name,
+                                                                    event.project.label,
                                                                     project.delivery_set.all().last()))
 
     @staticmethod
     def check_projects_all_config(project_name=None):
         projects = []
         if project_name:
-            projects.append(Project.objects.get(name=project_name))
+            projects.append(Project.objects.get(label=project_name))
         else:
             projects = Project.objects.filter().order_by("created")
         for project in projects:
@@ -59,7 +59,7 @@ class Command(BaseCommand):
         """
        以人的视角来查询发送的事件，只要人员信息在事件的接收关联列表里面
        """
-        project = Project.objects.get(name=project)
+        project = Project.objects.get(label=project)
         delivery_list = project.delivery_set.all()
         user = User.objects.get(username=user_name)
         groups_name = [group.name for group in user.groups.all()]

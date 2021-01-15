@@ -54,7 +54,7 @@ class Message(UUIDModel, TimeStampedModel, StatusModel, ExtraModel):
 
     def get_project(self) -> Project:
         """ 获取消息关联的项目"""
-        return Project.objects.get(name=self.project)
+        return Project.objects.get(label=self.project)
 
     def get_burr_messages(self, burr_converge) -> list:
         """ 基于毛刺收敛规则查询到区间内的所有同类消息"""
