@@ -77,10 +77,10 @@ def handle_message_alert(message: Message) -> None:
     """
     # 获取收敛规则的开启状态，如有开启的话启用削峰处理
     converge_status = False
-    try:
-        converge_status = message.get_project().converge_status
-    except Exception as e:
-        logger.error('{{"action":"Project no found {0}" ,m_id:"{1}"}}'.format(e, message.id))
+    # try:
+    converge_status = message.get_project().converge_status
+    # except Exception as e:
+    #     logger.error('{{"action":"Project no found {0}" ,m_id:"{1}"}}'.format(e, message.id))
     if converge_status:  # 如果启用收敛消息的策略处理，实现对消息削峰的处理效果
         for converge in message.get_burr_converges():
             create_event(message, converge)
