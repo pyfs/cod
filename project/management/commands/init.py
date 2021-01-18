@@ -19,7 +19,7 @@ class Command(BaseCommand):
     def __init__(self):
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Cod.settings')
         """加载文件数据"""
-        self.cmdb_data = json.load(open(os.path.join(settings.BASE_DIR, 'FeHelper-20201124150956.json')))
+        # self.cmdb_data = json.load(open(os.path.join(settings.BASE_DIR, 'FeHelper-20201124150956.json')))
         super(Command, self).__init__()
 
     def add_arguments(self, parser):

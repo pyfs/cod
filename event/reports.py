@@ -109,10 +109,7 @@ class ReportToEs(InitES):
             setattr(self, k, v)
         # 保存数据到es里面
         result = ""
-        try:
-            result = self.save(index=es_index)
-        except Exception as e:
-            logger.error("Push data ES Failed, error:{}".format(e))
+        result = self.save(index=es_index)
         if result == "created" or result == "updated":
             return True
         else:
