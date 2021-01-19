@@ -9,7 +9,7 @@ class EventAdmin(admin.ModelAdmin):
     search_fields = ['name', 'project__name', 'host', 'type']
     filter_horizontal = ['messages', 'receivers']
     fieldsets = [
-        ('基本信息', {'classes': ['grp-collapse grp-open'], 'fields': ['name', 'project', 'host', 'level', 'current_delivery', 'converge']}),
+        ('基本信息', {'classes': ['grp-collapse grp-open'], 'fields': ['name', 'project', 'host', 'level', 'current_delivery', 'converge', 'extra']}),
         ('人员管理', {'classes': ['grp-collapse grp-open'], 'fields': ['receivers']}),
         ('标签管理', {'classes': ['grp-collapse grp-open'], 'fields': ['tags']}),
         ('标记删除', {'classes': ['grp-collapse grp-open'], 'fields': ['is_removed']}),
