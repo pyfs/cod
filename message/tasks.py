@@ -10,7 +10,7 @@ from model_utils.models import now
 
 from converge.models import BurrConverge
 from delivery.models import Delivery
-from event.constants import STATUS_RESOLVED, STATUS_NOT_CLOSED, STATUS_TIMEOUT
+from event.constants import STATUS_RESOLVED, STATUS_NOT_CLOSED, STATUS_TIMEOUT, STATUS_CLOSED
 from event.models import Event
 from event.reports import ReportHandler
 from message.constants import STATUS_ALERT, STATUS_RECOVER, RULE_TYPES, LOOP_UPGRADE
@@ -123,7 +123,8 @@ def notification_processor(event_id):
     """
     # 基于事件ID拿到对象
     event = Event.objects.get(id=event_id)
-    if event.status not in STATUS_NOT_CLOSED:
+    # 检查事件是否关闭状态
+    if event.status in STATUS_CLOSED:
         logger.info('{{"e_id":"{0}","action":"event is closed."}}'.format(event_id))
         return None
     logger.debug('{{"e_id":"{0}","action":"event notification processor"}}'.format(event_id))
