@@ -10,10 +10,10 @@ from model_utils.models import now
 
 from converge.models import BurrConverge
 from delivery.models import Delivery
-from event.constants import STATUS_RESOLVED, STATUS_NOT_CLOSED, STATUS_TIMEOUT
+from event.constants import STATUS_RESOLVED, STATUS_NOT_CLOSED, STATUS_TIMEOUT, STATUS_CLOSED
 from event.models import Event
-from event.reports import ProjectTopStatistics, ReportHandler
-from message.constants import STATUS_ALERT, STATUS_RECOVER, RULE_TYPES
+from event.reports import ReportHandler
+from message.constants import STATUS_ALERT, STATUS_RECOVER, RULE_TYPES, LOOP_UPGRADE
 from message.models import Message
 from receive_strategy.constants import RECEIVE_CHOICES, TYPE_CHOICES, ALERT, RECOVERY
 from receive_strategy.models import ReceiveStrategy
@@ -76,11 +76,7 @@ def handle_message_alert(message: Message) -> None:
     :param message: 当前上报消息
     """
     # 获取收敛规则的开启状态，如有开启的话启用削峰处理
-    converge_status = False
-    # try:
     converge_status = message.get_project().converge_status
-    # except Exception as e:
-    #     logger.error('{{"action":"Project no found {0}" ,m_id:"{1}"}}'.format(e, message.id))
     if converge_status:  # 如果启用收敛消息的策略处理，实现对消息削峰的处理效果
         for converge in message.get_burr_converges():
             create_event(message, converge)
@@ -127,6 +123,10 @@ def notification_processor(event_id):
     """
     # 基于事件ID拿到对象
     event = Event.objects.get(id=event_id)
+    # 检查事件是否关闭状态
+    if event.status in STATUS_CLOSED:
+        logger.info('{{"e_id":"{0}","action":"event is closed."}}'.format(event_id))
+        return None
     logger.debug('{{"e_id":"{0}","action":"event notification processor"}}'.format(event_id))
     # 获取当前分派策略
     delivery = event.current_delivery
@@ -178,8 +178,10 @@ def notification_processor(event_id):
         logger.info('{{"e_id":"{0}","action":"event upgrade, send user list{1}"}}'.format(event.id, target_users_list))
         notification_processor.apply_async(args=[event.id], countdown=delivery.delay * 60)
     else:
-        logger.debug('{{"e_id":"{0}","action":"upgrade delivery is None, cancel upgrade."}}'.format(event.id))
-        return None
+        if event.level in LOOP_UPGRADE:
+            logger.info('{{"e_id":"{0}","action":"The event is of disaster level and is repeatedly sent to the '
+                        'administrator."}}'.format(event.id))
+            notification_processor.apply_async(args=[event.id], countdown=60)
 
 
 def get_target_user(users_obj, event) -> list:
@@ -228,12 +230,12 @@ def get_target_user(users_obj, event) -> list:
                     break
             else:
                 target_users_obj.append(user)
-                logger.info('{{"u_id":{0},"action":"get_target_user() '
-                            'user {1} add send target list"}}'.format(user.id, user.username))
+                logger.debug('{{"u_id":{0},"action":"get_target_user() '
+                             'user {1} add send target list"}}'.format(user.id, user.username))
         else:
             target_users_obj.append(user)
-            logger.info('{{"u_id":{0},"action":"get_target_user() '
-                        'user {1} add send target list"}}'.format(user.id, user.username))
+            logger.debug('{{"u_id":{0},"action":"get_target_user() '
+                         'user {1} add send target list"}}'.format(user.id, user.username))
     return target_users_obj
 
 

@@ -11,6 +11,9 @@ LEVEL_CHOICES = (
 # 需要升级的告警级别
 LEVEL_NEED_UPGRADE = [1, 2]
 
+# 针对告警类型重复发给用户,避免遗漏严重的告警类型
+LOOP_UPGRADE = [2]
+
 # 告警消息状态
 STATUS_ALERT = 'alert'
 STATUS_RECOVER = 'recover'
