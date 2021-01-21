@@ -23,6 +23,6 @@ JWT_AUTH = {
 
 # drf-extensions settings
 REST_FRAMEWORK_EXTENSIONS = {
-    'DEFAULT_CACHE_RESPONSE_TIMEOUT': 60 * 5,
-    'DEFAULT_CACHE_KEY_FUNC': 'utils.drf.cache_key.user_cache_key_func',
+    'DEFAULT_CACHE_RESPONSE_TIMEOUT': 30,
+    # 'DEFAULT_CACHE_KEY_FUNC': 'utils.drf.cache_key.user_cache_key_func',
 }
