@@ -9,7 +9,7 @@ class MultiSerializersMixin(object):
     """
     多序列化器插件
     !! Mixin 加载有序，请首先继承此类
-    actions = [create, delete, list retrieve, update, partial_update]
+    actions = [create, delete, list, retrieve, update, partial_update]
     """
     serializer_classes = []
     action = None

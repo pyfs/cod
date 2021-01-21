@@ -1,11 +1,30 @@
+from django.http.response import HttpResponseRedirect
 from rest_framework.decorators import action
-from rest_framework_extensions.cache.decorators import cache_response
-from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+from rest_framework.filters import SearchFilter
+from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from account.serializers import User, UserRetrieveSerializer
+from rest_framework_extensions.cache.decorators import cache_response
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+
+from account.serializers import User, UserRetrieveSerializer, UserListSerializer
 from project.serializers import ProjectSimpleSerializer
-from django.http.response import HttpResponseRedirect
+
+
+class AccountViewSet(ListModelMixin, GenericViewSet):
+    """用户模型操作"""
+    queryset = User.objects.filter(is_active=True, is_removed=False)
+    authentication_classes = [JSONWebTokenAuthentication]
+    serializer_class = UserListSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ['username', 'email', 'mobile']
+
+    # @cache_response(key_func=DefaultKeyConstructor(), timeout=60*5)
+    # def list(self, request, *args, **kwargs):
+    #     # self.pagination_class = []
+    #     queryset = self.filter_queryset(self.get_queryset())
+    #     serializer = self.get_serializer(queryset, many=True)
+    #     return Response(serializer.data)
 
 
 class CurrentViewSet(GenericViewSet):

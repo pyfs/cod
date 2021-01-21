@@ -28,7 +28,7 @@ class Env(object):
                     if line.startswith('#'):
                         continue
                     kv = line.split()[1].split('=')
-                    self.DATA[kv[0].strip()] = kv[1].strip()
+                    self.DATA[kv[0].strip()] = kv[1].strip().strip("'").strip('"')
         else:
             print("[warning]: envrc (%s) not exist, please check" % file_path)
 

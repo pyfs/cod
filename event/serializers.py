@@ -21,6 +21,7 @@ class EventRetrieveSerializer(ModelSerializer):
     ds = DataSourceSerializer(read_only=True)
     current_delivery = DeliveryListSerializer(read_only=True)
     receivers = UserListSerializer(read_only=True, many=True)
+    responder = UserListSerializer(read_only=True)
 
     class Meta:
         model = Event
