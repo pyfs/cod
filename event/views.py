@@ -55,7 +55,7 @@ class EventReceiverFilter(BaseFilterBackend):
 
 class MyEventViewSets(EventViewSets):
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ['status', 'responder']
+    filterset_fields = ['status', 'responder', 'level']
 
     @action(methods=['POST'], detail=False, url_path='claim')
     def alert_claim(self, request, **kwargs):
