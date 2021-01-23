@@ -1,15 +1,13 @@
 import os
-import json
-from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
 
+from django.contrib.auth.models import Group
+from django.core.exceptions import MultipleObjectsReturned
+from django.core.management.base import BaseCommand
+
+from account.models import User
 from converge.models import BurrConverge
 from delivery.models import Delivery
-from event.models import Event
 from project.models import Project
-from account.models import User
-from django.contrib.auth.models import Group
-
 from utils.common.constants import STATUS_PUBLISHED
 
 
@@ -24,6 +22,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--importproject', nargs='+', type=str)
+        parser.add_argument('--adddelivery', nargs='+', type=str)
 
     @staticmethod
     def get_user(user):
@@ -112,11 +111,37 @@ class Command(BaseCommand):
         #     self.create_delivery(data)
         for value in options.keys():
             if value == 'importproject':
-                project = options['importproject'][0]
-                user = options['importproject'][1]
-                # 基于项目创建产品线、产品、项目
-                self.create_project(project, user)
-                # 创建用户组
-                self.create_group(project, user)
-                # 创建分配策略
-                self.create_delivery(project, user)
+                if options['importproject']:
+                    project = options['importproject'][0]
+                    user = options['importproject'][1]
+                    # 基于项目创建产品线、产品、项目
+                    self.create_project(project, user)
+                    # 创建用户组
+                    self.create_group(project, user)
+                    # 创建分配策略
+                    self.create_delivery(project, user)
+                else:
+                    pass
+            elif value == 'adddelivery':
+                if options['adddelivery']:
+                    infra_project_list = Project.objects.get(label='INFRA').get_children()
+                    for product in infra_project_list:
+                        project = product.get_children().last()
+                        # 获取第一层告警
+                        try:
+                            parent_delivery = Delivery.objects.get(project=project, parent=None)
+                        except MultipleObjectsReturned as e:
+                            print(e)
+                        if not parent_delivery.get_children():
+                            # 获取通知的升级组
+                            upgrade_group = Group.objects.get(name='INFRA')
+                            # 创建新的告警分派策略
+                            second_delivery = Delivery.objects.update_or_create(parent=parent_delivery,
+                                                                                project=project,
+                                                                                owner=project.pic,
+                                                                                name='{}_第二级告警升级'.format(project.label),
+                                                                                delay=60)[0]
+                            # 关联通知组
+                            second_delivery.group.add(upgrade_group)
+                else:
+                    pass
