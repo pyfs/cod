@@ -270,8 +270,7 @@ class ReportHandler(object):
                                                     project_detail_content=project_detail_content)
 
             # 发送日报
-            send_result = ReportHandler().send_mail(report_sender_list, title,
-                                                    content=u'{r_content}'.format(r_content=report_content))
+            send_result = ReportHandler().send_mail(report_sender_list, title, content=report_content.replace("\n", ""))
 
             # 报告发送结果判断
             if send_result:
