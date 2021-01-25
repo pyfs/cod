@@ -78,10 +78,17 @@ class Event(UUIDModel, DateTimeFramedModel, TimeStampedModel, StatusModel, SoftD
             logger.debug("[debug] not found similar count: %s" % similar_event_count)
             return False
 
-    def get_local_time(self):
-        """ 获取事件的时间，数据库默认存的是UTC时间，该方法处理为北京时间"""
+    def get_created_time(self):
+        """ 获取事件创建的时间，数据库默认存的是UTC时间，该方法处理为北京时间"""
         cst_tz = timezone('Asia/Shanghai')
         cn_time = self.created.replace(tzinfo=cst_tz)
+        return cn_time + timedelta(hours=8)
+
+    def get_modified_time(self):
+        """ 获取事件关联告警消息的最后一条修改时间来返回，数据库默认存的是UTC时间，该方法处理为北京时间"""
+        cst_tz = timezone('Asia/Shanghai')
+        modified_time = self.messages.last().modified
+        cn_time = modified_time.replace(tzinfo=cst_tz)
         return cn_time + timedelta(hours=8)
 
     def get_receivers(self):
