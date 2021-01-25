@@ -87,14 +87,29 @@ class Event(UUIDModel, DateTimeFramedModel, TimeStampedModel, StatusModel, SoftD
     def get_modified_time(self):
         """ 获取事件关联告警消息的最后一条修改时间来返回，数据库默认存的是UTC时间，该方法处理为北京时间"""
         cst_tz = timezone('Asia/Shanghai')
-        modified_time = self.messages.last().modified
-        cn_time = modified_time.replace(tzinfo=cst_tz)
+        cn_time = self.modified.replace(tzinfo=cst_tz)
         return cn_time + timedelta(hours=8)
 
     def get_receivers(self):
         """ 获取事件已经通知的人员信息"""
-        receiver_list = [user.username for user in self.receivers.all()]
+        receiver_list = []
+        for user in self.receivers.all():
+            if user.cn_name:
+                receiver_list.append(user.cn_name)
         return ','.join(receiver_list)
 
+    def get_expend_time(self):
+        """ 计算事件的最后更新时间到创建时间之间持续多长时间。"""
+        expend = str(self.modified - self.created)
+        hours, minus, seconds = tuple(expend.split('.')[0].split(':'))
+        return '{0}时{1}分{2}秒'.format(hours, minus, seconds)
 
+    def get_upgrade_status(self) -> str:
+        """ 获取得分配策略下一级的升级状态，告知用户下一级预计发给那些干系人。"""
+        upgrade_delivery = self.current_delivery.get_children().first()
+        name_list = []
+        for user in upgrade_delivery.get_users():
+            if user.cn_name:
+                name_list.append(user.cn_name)
+        return '告警升级在{0}分钟后发给:{1}'.format(upgrade_delivery.delay, ','.join(name_list))
 
