@@ -31,22 +31,20 @@ class Delivery(MPTTModel, UUIDModel, OwnerModel, SoftDeletableModel, TimeStamped
 
     def get_users(self) -> list:
         """
-        todo 添加 receivers 字段，更新代码适配
-        todo 分派策略订阅用户加入获取目标用户列表
         分配策略关联的用户和组，多对多关系反查所有的通知用户和组，然后遍历里面关联的成员，最后返回用户的对象列表
         """
         users_obj = []
+        # 遍历所有关联的组
         for group in self.group.all():
-            # 遍历所有关联的组
             for user_object in group.user_set.all():
                 # 遍历组中的成员
                 users_obj.append(user_object)
                 logger.debug('{{"u_id":"{0}","action":"get_users() 通过分配策略获取所有关联组的用户列表{1}"}}'
                              ''.format(user_object.id, user_object.username))
+        # 获取订阅项目的干系人
         for receiver in self.receivers.all():
             if receiver not in users_obj:
                 users_obj.append(receiver)
-                logger.debug('{{"u_id":"{0}","action":"get_users() 通过分配策略获取所有通知的用户列表{1}"}}'
+                logger.debug('{{"u_id":"{0}","action":"get_users() 通过分配策略获取所有通知的订阅用户列表{1}"}}'
                              ''.format(user_object.id, user_object.username))
-
         return users_obj

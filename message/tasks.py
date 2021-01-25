@@ -390,6 +390,8 @@ def handle_message_recover(message: Message) -> None:
     events = Event.objects.filter(project__label=message.project, host=message.host, type=message.type,
                                   status__in=STATUS_NOT_CLOSED)
     recovery_event_obj = events.order_by('level').last()
+    # 告警恢复消息关联到时间
+    recovery_event_obj.message.add(message)
     if recovery_event_obj:
         recovery_users_obj = recovery_event_obj.receivers.all()
         # 遍历所有关联用户的阻断设置，找到目标用户
