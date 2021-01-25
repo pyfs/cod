@@ -100,7 +100,9 @@ class Event(UUIDModel, DateTimeFramedModel, TimeStampedModel, StatusModel, SoftD
 
     def get_expend_time(self):
         """ 计算事件的最后更新时间到创建时间之间持续多长时间。"""
-        return str(self.modified - self.created)
+        expend = str(self.modified - self.created)
+        hours, minus, seconds = tuple(expend.split('.')[0].split(':'))
+        return '{0}时{1}分{2}秒'.format(hours, minus, seconds)
 
     def get_upgrade_status(self) -> str:
         """ 获取得分配策略下一级的升级状态，告知用户下一级预计发给那些干系人。"""

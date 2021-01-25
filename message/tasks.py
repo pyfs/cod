@@ -390,25 +390,28 @@ def handle_message_recover(message: Message) -> None:
     events = Event.objects.filter(project__label=message.project, host=message.host, type=message.type,
                                   status__in=STATUS_NOT_CLOSED)
     recovery_event_obj = events.order_by('level').last()
-    # 告警恢复消息关联到时间
-    recovery_event_obj.message.add(message)
     if recovery_event_obj:
+        # 告警恢复消息关联到时间
+        recovery_event_obj.messages.add(message)
+        # 更新事件为解决状态
+        recovery_event_obj.status = STATUS_RESOLVED
+        recovery_event_obj.save()
+        # 获取所有的已发送人员
         recovery_users_obj = recovery_event_obj.receivers.all()
-        # 遍历所有关联用户的阻断设置，找到目标用户
-        target_users_obj = get_target_user(recovery_users_obj, recovery_event_obj)
-        # 遍历所有目标用户的接收策略，把目标用户分配到不同的发送渠道
-        send_channel = get_send_channel(target_users_obj)
-        # 发送通知给用户
-        # title = recovery_event_obj.name
-        msg_type = RECOVERY
-        send_notification(send_channel, recovery_event_obj, msg_type)
-        logger.info(
-            '{{"e_id":"{0}","m_id":"{1}","action":"Recovery event success,IP{2} }}'.format(recovery_event_obj.id,
+        # 如果发送人员是否为空
+        if recovery_users_obj:
+            # 遍历所有关联用户的阻断设置，找到目标用户
+            target_users_obj = get_target_user(recovery_users_obj, recovery_event_obj)
+            # 遍历所有目标用户的接收策略，把目标用户分配到不同的发送渠道
+            send_channel = get_send_channel(target_users_obj)
+            # 发送通知给用户
+            # title = recovery_event_obj.name
+            msg_type = RECOVERY
+            send_notification(send_channel, recovery_event_obj, msg_type)
+            logger.info(
+                '{{"e_id":"{0}","m_id":"{1}","action":"Recovery event success,IP{2} }}'.format(recovery_event_obj.id,
                                                                                            message.id,
                                                                                            recovery_event_obj.host))
-    if events:
-        # 事件状态更新为:告警恢复，关闭事件
-        events.update(status=STATUS_RESOLVED)
 
 
 @shared_task(ignore_result=True)
