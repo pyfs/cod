@@ -2,6 +2,7 @@ import logging
 from collections import OrderedDict, Counter
 from datetime import timedelta, datetime
 
+from django.db.models import Q
 from elasticsearch_dsl import Q
 from elasticsearch_dsl import Search
 from jinja2 import Template, Environment, PackageLoader
@@ -11,9 +12,8 @@ from event.models import Event
 from message.models import Message
 from project.models import Project
 from send_template.models import SendTemplate
-from utils.elasticsearch import InitES
-from django.db.models import Q
 from utils.common.alert import EmailAlerter
+from utils.elasticsearch import InitES
 
 logger = logging.getLogger('django')
 
@@ -61,7 +61,8 @@ class ProjectTopStatistics(Reports):
         projects = list(filter(lambda x: x.get_children().last() is None, Project.objects.all()))
         for project in projects:
             # 查询项目关联事件数量
-            events = Event.objects.filter(project=project).count()
+            events = Event.objects.filter(project=project).filter(created__gte=self.yesterday_midnight,
+                                                                  created__lte=self.midnight).count()
             if events:
                 all_projects_events[project] = events
         # 对字典的value(t[1]的关键指定, key排序则是t[0])进行倒序排序(reverse=True)

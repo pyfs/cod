@@ -83,3 +83,11 @@ class Event(UUIDModel, DateTimeFramedModel, TimeStampedModel, StatusModel, SoftD
         cst_tz = timezone('Asia/Shanghai')
         cn_time = self.created.replace(tzinfo=cst_tz)
         return cn_time + timedelta(hours=8)
+
+    def get_receivers(self):
+        """ 获取事件已经通知的人员信息"""
+        receiver_list = [user.username for user in self.receivers.all()]
+        return ','.join(receiver_list)
+
+
+
