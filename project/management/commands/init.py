@@ -1,5 +1,6 @@
 import os
 
+import requests
 from django.contrib.auth.models import Group
 from django.core.exceptions import MultipleObjectsReturned
 from django.core.management.base import BaseCommand
@@ -23,6 +24,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--importproject', nargs='+', type=str)
         parser.add_argument('--adddelivery', nargs='+', type=str)
+        parser.add_argument('--updateuser', nargs='+', type=str)
 
     @staticmethod
     def get_user(user):
@@ -101,6 +103,30 @@ class Command(BaseCommand):
 
         delivery.group.add(Group.objects.get(name=project_name))
 
+    @staticmethod
+    def get_ad_user_info(username):
+        url = "https://itgw.cvte.com/env-101/infra/public/ad/v1/user/?accounts={}".format(username)
+
+        headers = {
+            'apikey': '请获取正确的Token信息',
+        }
+
+        response = requests.request("GET", url, headers=headers)
+        if response.status_code == 200:
+            return response.json()['data']
+        else:
+            return None
+
+    def update_user_name(self):
+        user_list = [user.username for user in User.objects.filter()]
+        for name in user_list:
+            ad_user = self.get_ad_user_info(name)
+            if ad_user:
+                ad_user_result = ad_user[0]
+                user = self.get_user(ad_user_result['sAMAccountName'])
+                user.cn_name = ad_user_result['cn']
+                user.save()
+
     def handle(self, *args, **options):
         # for data in self.cmdb_data:
         #     # 创建项目
@@ -145,3 +171,6 @@ class Command(BaseCommand):
                             second_delivery.group.add(upgrade_group)
                 else:
                     pass
+            elif value == 'updateuser':
+                if options['updateuser']:
+                    self.update_user_name()
