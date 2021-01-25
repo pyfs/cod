@@ -10,7 +10,7 @@ from account.forms import UserChangeForm, UserCreationForm
 @admin.register(User)
 class AccountUserAdmin(UserAdmin):
     fieldsets = [
-        ('必填字段', {'classes': ['grp-collapse grp-open'], 'fields': ('email', 'mobile')}),
+        ('必填字段', {'classes': ['grp-collapse grp-open'], 'fields': ('cn_name', 'email', 'mobile')}),
         ('选填字段', {'classes': ['grp-collapse grp-open'], 'fields': ('first_name', 'last_name', 'avatar')}),
         ('联系方式', {'classes': ['grp-collapse grp-open'], 'fields': ('wx', 'qq')}),
         ('群组权限', {'classes': ['grp-collapse grp-open'], 'fields': ('groups', 'user_permissions')}),
@@ -25,12 +25,12 @@ class AccountUserAdmin(UserAdmin):
     add_fieldsets = (
         ('用户信息', {
             'classes': ['grp-collapse grp-open'],
-            'fields': ['username', 'email', 'password', 'mobile']}),
+            'fields': ['username', 'cn_name', 'email', 'password', 'mobile']}),
     )
     form = UserChangeForm
     add_form = UserCreationForm
-    list_display = ['username', 'email', 'mobile', 'wx', 'global_immunity', 'similar_block', 'is_active', 'is_superuser',
+    list_display = ['username', 'cn_name', 'email', 'mobile', 'wx', 'global_immunity', 'similar_block', 'is_active', 'is_superuser',
                     'is_removed']
     list_filter = ['is_active', 'is_staff', 'is_superuser', 'is_removed']
-    search_fields = ['email', 'mobile', 'wx', 'username']
+    search_fields = ['email', 'mobile', 'wx', 'username', 'cn_name']
     ordering = ['username']
