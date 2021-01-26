@@ -26,6 +26,7 @@ class Project(MPTTModel, UUIDModel, OwnerModel, SoftDeletableModel, TimeStampedM
                                          related_name='subscribe_project')
     filter_types = models.TextField(verbose_name='合并类型', blank=True, null=True)
     converge_status = models.BooleanField(verbose_name='开启收敛', default=False)
+    upgrade_frequency = models.IntegerField(verbose_name='升级频率', default=5*60)
 
     tags = TaggableManager(through=TaggedUUIDItem, blank=True)
 

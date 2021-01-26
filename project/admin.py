@@ -8,11 +8,11 @@ class ProjectAdmin(DraggableMPTTAdmin):
     list_display = ['tree_actions', 'indented_title', 'name', 'label', 'pic', 'owner', 'is_removed', 'created',
                     'modified']
     list_display_links = ['indented_title']
-    list_filter = ['is_removed', 'pic', 'owner']
+    list_filter = ['is_removed', 'pic', 'owner', 'upgrade_frequency']
     search_fields = ['name', 'pic__username', 'owner__username', 'label']
     fieldsets = [
         ('基本信息',
-         {'classes': ['grp-collapse grp-open'], 'fields': ['name', 'label', 'pic', 'filter_types', 'owner', 'parent']}),
+         {'classes': ['grp-collapse grp-open'], 'fields': ['name', 'label', 'pic', 'filter_types', 'owner', 'parent','upgrade_frequency']}),
         ('配置管理', {'classes': ['grp-collapse grp-open'], 'fields': ['converge_status']}),
         ('成员管理', {'classes': ['grp-collapse grp-open'], 'fields': ['members', 'subscribers']}),
         ('标签管理', {'classes': ['grp-collapse grp-open'], 'fields': ['tags']}),

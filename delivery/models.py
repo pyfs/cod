@@ -19,6 +19,7 @@ class Delivery(MPTTModel, UUIDModel, OwnerModel, SoftDeletableModel, TimeStamped
     receivers = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name='通知用户', blank=True,
                                        related_name='receiver_delivery')
     delay = models.PositiveSmallIntegerField(verbose_name='延迟时间', default=15)
+    upgrade_status = models.CharField(verbose_name='升级状态', max_length=50, blank=True, null=True)
 
     class MPTTMeta:
         order_insertion_by = ['name']
