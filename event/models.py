@@ -117,6 +117,7 @@ class Event(UUIDModel, DateTimeFramedModel, TimeStampedModel, StatusModel, SoftD
 
     def get_upgrade_delivery(self):
         """ 获取得分配策略下一级的升级状态，告知用户下一级预计发给那些干系人。"""
+        # todo 如下逻辑返回给到模板编辑,增加灵活配置
         if self.current_delivery:
             upgrade_delivery = self.current_delivery.get_children().last()
             if upgrade_delivery:
