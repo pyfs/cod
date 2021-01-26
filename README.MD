@@ -27,10 +27,11 @@ gantt
 
     section 部署支持
     s2i-python-container   :s2i-python-container, 2021-01-04, 2021-01-08
-    CICD 优化   :after s2i-python-container, 2021-01-31
+    优化 CD 构建速度   :after s2i-python-container, 2021-01-31
 
     section 文档补全
     安装部署文档    :active, 2021-01-13, 2021-01-31
+    春节假期    : holiday, 2021-02-11, 2021-02-17
     核心代码逻辑文档    :code, 2021-02-01, 2021-02-28
     使用说明文档    :after code, 2021-03-31
     
