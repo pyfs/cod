@@ -23,8 +23,7 @@ class ProjectViewSet(CacheResponseMixin, ModelViewSet):
         serializer = ProjectTreeSerializer(plist, many=True)
         return Response(serializer.data)
 
-    @cache_response()
-    @action(methods=['POST'], detail=True)
+    @action(methods=['POST'], detail=True, permission_classes=[])
     def subscribe(self, request, **kwargs):
         current = request.user
         pk = kwargs.get('pk')
@@ -35,8 +34,7 @@ class ProjectViewSet(CacheResponseMixin, ModelViewSet):
         except Exception as e:
             return Response({'status': 'error', 'data': e})
 
-    @cache_response()
-    @action(methods=['POST'], detail=True)
+    @action(methods=['POST'], detail=True, permission_classes=[])
     def unsubscribe(self, request, **kwargs):
         current = request.user
         pk = kwargs.get('pk')
