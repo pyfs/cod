@@ -2,6 +2,7 @@ import logging
 
 from django.conf import settings
 from django.db import models
+from datetime import datetime
 from model_utils.choices import Choices
 from model_utils.models import TimeStampedModel, StatusModel, SoftDeletableModel, UUIDModel
 from taggit.managers import TaggableManager
@@ -98,18 +99,36 @@ class Event(UUIDModel, DateTimeFramedModel, TimeStampedModel, StatusModel, SoftD
                 receiver_list.append(user.cn_name)
         return ','.join(receiver_list)
 
-    def get_expend_time(self):
-        """ 计算事件的最后更新时间到创建时间之间持续多长时间。"""
+    def get_expend_recover_time(self):
+        """ 事件恢复之后，计算事件的最后更新时间到创建时间之间持续多长时间。"""
         expend = str(self.modified - self.created)
         hours, minus, seconds = tuple(expend.split('.')[0].split(':'))
         return '{0}时{1}分{2}秒'.format(hours, minus, seconds)
 
-    def get_upgrade_status(self) -> str:
-        """ 获取得分配策略下一级的升级状态，告知用户下一级预计发给那些干系人。"""
-        upgrade_delivery = self.current_delivery.get_children().first()
-        name_list = []
-        for user in upgrade_delivery.get_users():
-            if user.cn_name:
-                name_list.append(user.cn_name)
-        return '告警升级在{0}分钟后发给:{1}'.format(upgrade_delivery.delay, ','.join(name_list))
+    def get_expend_warning_time(self):
+        """ 事件告警时间计算，当前时间和事件最后的修改时间的持续时长。"""
+        expend = str(datetime.now(tz=timezone('UTC')) - self.modified)
+        hours, minus, seconds = tuple(expend.split('.')[0].split(':'))
+        # 判断第一次发送告警，事件最后的消耗时间是在程序里面。只有重复发送和告警升级才做时间计算
+        if int(minus) >= 1:
+            return '{0}时{1}分{2}秒'.format(hours, minus, seconds)
+        else:
+            return None
 
+    def get_upgrade_delivery(self):
+        """ 获取得分配策略下一级的升级状态，告知用户下一级预计发给那些干系人。"""
+        if self.current_delivery:
+            upgrade_delivery = self.current_delivery.get_children().last()
+            if upgrade_delivery:
+                name_list = []
+                for user in upgrade_delivery.get_users():
+                    if user.cn_name:
+                        name_list.append(user.cn_name)
+                if name_list:
+                    return '告警升级在{0}分钟后发给:{1}'.format(upgrade_delivery.delay, ','.join(name_list))
+                else:
+                    return None
+            else:
+                return None
+        else:
+            return None

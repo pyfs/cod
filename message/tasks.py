@@ -125,7 +125,7 @@ def notification_processor(event_id):
     event = Event.objects.get(id=event_id)
     # 检查事件是否关闭状态
     if event.status in STATUS_CLOSED:
-        logger.info('{{"e_id":"{0}","action":"event is closed."}}'.format(event_id))
+        logger.info('{{"e_id":"{0}","action":"event is closed, cancel notification processor."}}'.format(event_id))
         return None
     logger.debug('{{"e_id":"{0}","action":"event notification processor"}}'.format(event_id))
     # 获取当前分派策略
@@ -171,17 +171,21 @@ def notification_processor(event_id):
 
     # 最后处理完成通知的所有环节，对事件进行关联上一层分配策略
     upgrade_delivery = delivery.get_children().last()
-    if upgrade_delivery:
+    if upgrade_delivery and upgrade_delivery.get_upgrade_level(event.level):
         event.current_delivery = upgrade_delivery
         event.save()
         # 递归调用自身函数来处理通知
         logger.info('{{"e_id":"{0}","action":"event upgrade, send user list{1}"}}'.format(event.id, target_users_list))
         notification_processor.apply_async(args=[event.id], countdown=delivery.delay * 60)
     else:
-        if event.level in LOOP_UPGRADE:
-            logger.info('{{"e_id":"{0}","action":"The event is of disaster level and is repeatedly sent to the '
-                        'administrator."}}'.format(event.id))
-            notification_processor.apply_async(args=[event.id], countdown=60)
+        logger.info('{{"e_id":"{0}","action":"The event complete upgrade is over"}}'.format(event.id))
+
+    # 用于递归调度给到项目管理员循环通知需要升级的告警
+    if event.level in LOOP_UPGRADE:
+        logger.info('{{"e_id":"{0}","action":"The event is of disaster level and is repeatedly sent to the '
+                    'administrator."}}'.format(event.id))
+        # 基于项目设置的发送频率
+        notification_processor.apply_async(args=[event.id], countdown=event.project.upgrade_frequency)
 
 
 def get_target_user(users_obj, event) -> list:
