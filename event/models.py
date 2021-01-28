@@ -134,14 +134,27 @@ class Event(UUIDModel, DateTimeFramedModel, TimeStampedModel, StatusModel, SoftD
         else:
             return None
 
-    def get_shortener_url(self):
-        """ 基于事件ID生成短网址"""
+    @staticmethod
+    def get_generate_shortener(key, value):
+        """ 基于URL生成短连接，以事件ID为关键进行缓存"""
         s = Shortener()
-        event_url = 'https://cod.gz.cvte.cn/event/detail/{0}'.format(self.id)
         from django.core.cache import caches
         client = caches['default']
-        value = client.get(self.id)
-        if not value:
-            value = s.url_to_shortener(event_url)
-            client.set(self.id, value, timeout=7200)
+        value = client.get(key)
+        if value:
             return value
+        else:
+            value = s.url_to_shortener(value)
+            client.set(key, value, timeout=7200)
+            return value
+
+    def get_event_detail(self):
+        """ 基于事件ID生成短网址"""
+        event_url = 'https://cod.gz.cvte.cn/event/detail/{0}'.format(self.id)
+        return self.get_generate_shortener(self.id, event_url)
+
+    def get_host_detail(self):
+        """ 基于主机IP地址来生成grafana监控地址"""
+        host_url = 'https://grafana.cvte.com/d/9CWBz0bik/node-exporter-details?orgId=1&var-hostname={0}&var' \
+                   '-ipaddress={1}&var-interval=5m&refresh=5m'.format(self.json_extra['hostname'], self.host)
+        return self.get_generate_shortener(self.host, host_url)
