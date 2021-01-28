@@ -135,7 +135,7 @@ class Event(UUIDModel, DateTimeFramedModel, TimeStampedModel, StatusModel, SoftD
             return None
 
     @staticmethod
-    def get_generate_shortener(key, value):
+    def get_generate_shortener(key, data):
         """ 基于URL生成短连接，以事件ID为关键进行缓存"""
         s = Shortener()
         from django.core.cache import caches
@@ -144,7 +144,7 @@ class Event(UUIDModel, DateTimeFramedModel, TimeStampedModel, StatusModel, SoftD
         if value:
             return value
         else:
-            value = s.url_to_shortener(value)
+            value = s.url_to_shortener(data)
             client.set(key, value, timeout=7200)
             return value
 
