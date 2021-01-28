@@ -42,6 +42,7 @@ class Shortener(object):
         response = requests.request(method="POST", url="%s?%s" % (self.app_url, payload), headers=header)
         if response.ok:
             result = response.json()
+            logger.info(dict(app='shortener', msg=result))
             # 判断返回结果对应的节点信息
             if 'entity' in result.keys() and isinstance(result['entity'], dict):
                 return result['entity']['shortUrl']
