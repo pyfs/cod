@@ -1,13 +1,13 @@
 import logging
+from datetime import datetime
+from datetime import timedelta
 
 from django.conf import settings
 from django.db import models
-from datetime import datetime
 from model_utils.choices import Choices
 from model_utils.models import TimeStampedModel, StatusModel, SoftDeletableModel, UUIDModel
-from taggit.managers import TaggableManager
-from datetime import timedelta
 from pytz import timezone
+from taggit.managers import TaggableManager
 
 from converge.models import BurrConverge
 from data_source.models import DataSource
@@ -18,8 +18,8 @@ from message.constants import LEVEL_CHOICES, LEVEL_WARNING
 from message.models import Message
 from project.models import Project
 from utils.common.models import OwnerModel, DateTimeFramedModel, ExtraModel
+from utils.shortener import Shortener
 from utils.taggit.models import TaggedUUIDItem
-
 
 logger = logging.getLogger('django')
 
@@ -133,3 +133,15 @@ class Event(UUIDModel, DateTimeFramedModel, TimeStampedModel, StatusModel, SoftD
                 return None
         else:
             return None
+
+    def get_shortener_url(self):
+        """ 基于事件ID生成短网址"""
+        s = Shortener()
+        event_url = 'https://cod.gz.cvte.cn/event/detail/{0}'.format(self.id)
+        from django.core.cache import caches
+        client = caches['default']
+        value = client.get(self.id)
+        if not value:
+            value = s.url_to_shortener(event_url)
+            client.set(self.id, value, timeout=7200)
+            return value
