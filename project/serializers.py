@@ -72,3 +72,14 @@ class ProjectSyncSerializer(serializers.ModelSerializer):
         if not users:
             raise serializers.ValidationError("username not found, check username in COD.")
         return users.last()
+
+
+class ProjectLeafSerializer(TaggitSerializer, serializers.ModelSerializer):
+    """序列化叶子节点"""
+    tags = TagListSerializerField()
+    parent = RecursiveField()
+
+    class Meta:
+        model = Project
+        fields = ['id', 'name', 'parent', 'label', 'tags', 'created', 'modified']
+        depth = 3
