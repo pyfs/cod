@@ -5,7 +5,6 @@ from rest_framework.filters import SearchFilter
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from rest_framework_extensions.cache.mixins import ListCacheResponseMixin
 
 from event.serializers import Event, EventListSerializer, EventRetrieveSerializer
 from message.serializers import RestAPIMessageListSerializer
@@ -14,7 +13,7 @@ from utils.drf.mixins import MultiSerializersMixin
 from event.constants import STATUS_REVOKED
 
 
-class EventViewSets(ListCacheResponseMixin, MultiSerializersMixin, RetrieveModelMixin, ListModelMixin, UpdateModelMixin,
+class EventViewSets(MultiSerializersMixin, RetrieveModelMixin, ListModelMixin, UpdateModelMixin,
                     GenericViewSet):
     queryset = Event.objects.filter(is_removed=False)
     filter_backends = [DjangoFilterBackend, ProjectFilterBackend, SearchFilter]

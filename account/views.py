@@ -38,7 +38,6 @@ class CurrentViewSet(GenericViewSet):
         serializer = UserRetrieveSerializer(request.user)
         return Response(serializer.data)
 
-    @cache_response()
     @action(methods=['GET'], detail=False)
     def get_projects_subscribed(self, request, **kwargs):
         projects_subscribed = request.user.subscribe_project.all()
