@@ -35,7 +35,7 @@ class Shortener(object):
     def url_to_shortener(self, url):
         """ 请求接口生成短网址"""
         payload = "longUrl=%s" % url
-        signature = self.create_sha256_signature(key=self.app_secret, message=quote(payload, "uft-8"))
+        signature = self.create_sha256_signature(key=self.app_secret, message=quote(payload, safe=''))
         header = {"x-auth-short-app": self.app,
                   "x-auth-short-sign": signature,
                   "Content-Type": "application/x-www-form-urlencoded"}
