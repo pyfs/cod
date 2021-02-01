@@ -1,7 +1,8 @@
-from account.models import User
 from django.contrib.auth.models import Group
 from rest_framework import serializers
 from taggit_serializer.serializers import TagListSerializerField, TaggitSerializer
+
+from account.models import User
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -18,12 +19,13 @@ class UserListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'name', 'avatar', 'wx', 'mobile']
+        fields = ['id', 'username', 'cn_name', 'name', 'avatar', 'wx', 'mobile']
 
     @staticmethod
     def get_name(obj):
-        """参考 user.__str__"""
-        return str(obj)
+        # 为适配 ant design pro CurrentUser
+        # 也可以修改 cn_name 为 name 来实现，后续 cc_django 版本更新
+        return obj.cn_name or str(obj)
 
 
 class UserRetrieveSerializer(TaggitSerializer, UserListSerializer):

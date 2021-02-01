@@ -119,3 +119,27 @@ class ProjectReportViewSet(CacheResponseMixin, RetrieveModelMixin, GenericViewSe
         levels = instance.event_set.filter(created__gte=date_start, created__lte=date_end).values('level').annotate(
             count=Count('level'))
         return Response({'data': levels, 'date_range': {'date_start': date_start, 'date_end': date_end}})
+
+    @action(methods=['GET'], detail=True)
+    def host_percent(self, request, *args, **kwargs):
+        instance = self.get_object()
+        date_start, date_end = self.get_date_range(request)
+        hosts = instance.event_set.filter(created__gte=date_start, created__lte=date_end).values('host').annotate(
+            count=Count('host'))
+        return Response({'data': hosts, 'date_range': {'date_start': date_start, 'date_end': date_end}})
+
+    @action(methods=['GET'], detail=True)
+    def status_percent(self, request, *args, **kwargs):
+        instance = self.get_object()
+        date_start, date_end = self.get_date_range(request)
+        states = instance.event_set.filter(created__gte=date_start, created__lte=date_end).values('status').annotate(
+            count=Count('status'))
+        return Response({'data': states, 'date_range': {'date_start': date_start, 'date_end': date_end}})
+
+    @action(methods=['GET'], detail=True)
+    def receivers_percent(self, request, *args, **kwargs):
+        instance = self.get_object()
+        date_start, date_end = self.get_date_range(request)
+        receivers = instance.event_set.filter(created__gte=date_start, created__lte=date_end).values(
+            'receivers__cn_name').annotate(count=Count('receivers'))
+        return Response({'data': receivers, 'date_range': {'date_start': date_start, 'date_end': date_end}})
