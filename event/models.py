@@ -145,7 +145,7 @@ class Event(UUIDModel, DateTimeFramedModel, TimeStampedModel, StatusModel, SoftD
             return value
         else:
             value = s.url_to_shortener(data)
-            client.set(key, value, timeout=7200)
+            client.set(key, value, timeout=3600)
             return value
 
     def get_event_detail(self):

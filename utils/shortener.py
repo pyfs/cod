@@ -42,6 +42,7 @@ class Shortener(object):
         data = {
             'longUrl': url
         }
+        logger.info(dict(app='shortener', encode_url=quote(payload, safe='')))
         response = requests.request(method="POST", url=self.app_url, headers=header, data=data)
         if response.ok:
             result = response.json()
