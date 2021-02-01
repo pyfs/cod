@@ -39,7 +39,11 @@ class Shortener(object):
         header = {"x-auth-short-app": self.app,
                   "x-auth-short-sign": signature,
                   "Content-Type": "application/x-www-form-urlencoded"}
-        response = requests.request(method="POST", url="%s?%s" % (self.app_url, payload), headers=header)
+        data = {
+            'longUrl': url
+        }
+        logger.info(dict(app='shortener', encode_url=quote(payload, safe='')))
+        response = requests.request(method="POST", url=self.app_url, headers=header, data=data)
         if response.ok:
             result = response.json()
             logger.info(dict(app='shortener', msg=result))
