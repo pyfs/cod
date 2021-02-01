@@ -10,7 +10,8 @@ from utils.drf.serializers import RobustSerializer
 class RestAPIMessageListSerializer(ModelSerializer):
     class Meta:
         model = Message
-        fields = ['id', 'project', 'type', 'host', 'title', 'level', 'status', 'data_source', 'created', 'modified']
+        fields = ['id', 'project', 'type', 'extra', 'host', 'title', 'level', 'status', 'data_source', 'created',
+                  'modified']
 
 
 class RestAPICreateMessageSerializer(ModelSerializer):

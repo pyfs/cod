@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework_recursive.fields import RecursiveField
 from taggit_serializer.serializers import TagListSerializerField, TaggitSerializer
-
+from account.serializers import UserListSerializer
 from project.models import Project
 
 
@@ -77,9 +77,9 @@ class ProjectSyncSerializer(serializers.ModelSerializer):
 class ProjectLeafSerializer(TaggitSerializer, serializers.ModelSerializer):
     """序列化叶子节点"""
     tags = TagListSerializerField()
-    parent = RecursiveField()
+    pic = UserListSerializer(read_only=True)
+    subscribers = UserListSerializer(read_only=True, many=True)
 
     class Meta:
         model = Project
-        fields = ['id', 'name', 'parent', 'label', 'tags', 'created', 'modified']
-        depth = 3
+        fields = ['id', 'name', 'pic', 'subscribers', 'upgrade_frequency', 'label', 'tags', 'created', 'modified']
