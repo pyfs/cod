@@ -306,7 +306,7 @@ def send_notification(users, event, msg_type):
         logger.debug('{{"e_id":"{0}","action":"获取不同告警渠道的人员列表信息. 用户列表:{1}"}}'.format(event.id, send_users_list))
 
         # 获取渠道默认模板
-        channel_default_template_object = SendTemplate.objects.filter(channel=i, type=msg_type)
+        channel_default_template_object = SendTemplate.objects.filter(channel=i, type=msg_type, is_removed=False)
         # 获取数据源模板
         datasource_template_object = channel_default_template_object.filter(ds__name=data_source)
         content = ''
