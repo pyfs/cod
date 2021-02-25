@@ -1,8 +1,8 @@
 from event.models import Event
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from project.serializers import ProjectSimpleSerializer, ProjectSerializer
 from data_source.serializers import DataSourceSerializer
-from delivery.serializers import DeliveryListSerializer, UserListSerializer
+from delivery.serializers import DeliveryListSerializer
 from account.serializers import UserListSerializer
 
 

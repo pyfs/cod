@@ -1,19 +1,24 @@
+import logging
+from datetime import timedelta
+
+from dateutil.utils import today
+from django.db.models import Count, Value, CharField
 from django_filters.rest_framework import DjangoFilterBackend
+from jsonpath_rw import parse
 from rest_framework import status
 from rest_framework.authentication import get_authorization_header
+from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework_extensions.mixins import CacheResponseMixin
-from utils.drf.mixins import MultiSerializersMixin
-from jsonpath_rw import parse
-import logging
 
+from auth_token.models import AuthToken
 from data_source.authentications import TokenAuthentication
 from message.models import Message
 from message.serializers import RestAPICreateMessageSerializer, PrometheusMessageSerializer
-from auth_token.models import AuthToken
+from utils.drf.mixins import MultiSerializersMixin
 
 logger = logging.getLogger('django')
 
@@ -92,3 +97,24 @@ class PrometheusMessageViewSets(CreateModelMixin, GenericViewSet):
             serializer.save()
             response_data.append(serializer.data)
         return Response({"data": response_data}, status=status.HTTP_201_CREATED)
+
+
+class MessageViewSets(MultiSerializersMixin, GenericViewSet):
+    queryset = Message.objects.filter()
+
+    @staticmethod
+    def get_date_range(request):
+        date_start = request.GET.get('date_start', (today() - timedelta(days=15)).strftime('%Y-%m-%d'))
+        date_end = request.GET.get('date_end', (today() + timedelta(days=1)).strftime('%Y-%m-%d'))
+        return date_start, date_end
+
+    @action(methods=['GET'], detail=False, url_path='message_count_per_day', permission_classes=[])
+    def get_message_count_per_day(self, request, *args, **kwargs):
+        """按天获取消息数量"""
+        date_start, date_end = self.get_date_range(request)
+        message_count_per_day = self.queryset.filter(created__gte=date_start, created__lte=date_end).extra(
+            select={"date": "to_char(created, 'YYYY-MM-DD')"}).annotate(
+            series=Value('message', output_field=CharField())).values('date', 'series').annotate(
+            count=Count('created')).order_by('date')
+        return Response({'data': message_count_per_day, 'date_range': {'date_start': date_start, 'date_end': date_end}})
+

@@ -1,10 +1,10 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from silence.views import SilenceViewSet
 
-from event.views import EventViewSets, MyEventViewSets
+
 router = DefaultRouter()
-router.register(r'events', EventViewSets)
-router.register(r'my-alerts', MyEventViewSets)
+router.register(r'silences', SilenceViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

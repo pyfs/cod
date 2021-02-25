@@ -38,6 +38,7 @@ urlpatterns += [
     path('<version>/project/', include('project.urls')),
     path('<version>/ds/', include('data_source.urls')),
     path('<version>/message/', include('message.urls')),
+    path('<version>/silence/', include('silence.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
