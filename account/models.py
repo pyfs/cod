@@ -1,14 +1,12 @@
-from datetime import datetime
-
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import BaseUserManager
+from django.db import models
 from django.utils import timezone
 from model_utils.models import SoftDeletableModel, UUIDModel
-from django.contrib.auth.models import BaseUserManager
-from django.forms.models import model_to_dict
+from taggit.managers import TaggableManager
+
 from account.avatar import IDAvatar
 from utils.taggit.models import TaggedUUIDItem
-from taggit.managers import TaggableManager
 
 
 class UserManager(BaseUserManager):
@@ -78,19 +76,26 @@ class User(UUIDModel, SoftDeletableModel, AbstractUser):
         """
         return [rs.channel for rs in self.receivestrategy_set.all()]
 
-    def get_silence_ignore_type(self):
-        """ 基于用户查询关联的沉默规则，判断当前时间是否在star < now < end, 如果真则返回true"""
+    def get_silence_ignore_type(self, send_event) -> bool:
+        """ 基于用户查询关联的沉默规则，判断当前发送的告警事件是否和关联的事件一致。属于同类事件进行沉默处理,同时对该规则增加了生效时段."""
         #  查询数据库是此类日期格式会有异常，怀疑和sqlite3 存放数据有关系，存疑。
         # date_now = timezone.now()  # 2020-11-10 08:25:56.529617+00:00
         # date_now = datetime.now()  # 2020-11-10 16:25:56.959058
-        ignore_type = False
-        for silence in self.silence_set.all():
-            if not silence.is_removed and silence.start < timezone.now() < silence.end:
-                ignore_type = True
+        # 发送的告警事件, 是函数入参对象 send_event
+        # 沉默规则关联事件， silence.event 用于比对事件关联的字段
+        # 默认返回结果字段
+        result = False
+        silences = self.silence_set.filter(project=send_event.project, is_removed=False, start__lte=timezone.now(),
+                                           end__gte=timezone.now())  # 搜索有效的沉默规则
+        for si in silences:
+            # 判断下面两种情况，前置条件都是主机地址相等的
+            if si.ignore_type or si.event.type == send_event.type:  # 启用忽略类型，或者判断沉默规则关联事件的类型和发送事件类型是否一致
+                result = True
                 break
-            else:
-                ignore_type = False
-        return ignore_type
+            elif not si.ignore_type and si.event.type == send_event.type:  # 不启用忽略类型(默认配置) ,同时判断主机地址一致
+                result = True
+                break
+        return result
 
     def get_user_tags(self, tag_type='daily') -> list:
         """ 基于用户查询指定标签的内容 """

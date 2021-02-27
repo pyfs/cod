@@ -213,7 +213,7 @@ def get_target_user(users_obj, event) -> list:
             logger.info('{{"u_id":"{0}","action":"Similar_block rule is enable,user {1} removed from the sender '
                         'list"}}'.format(user.id, user.username))
             continue
-        elif user.get_silence_ignore_type():  # 判断用户是否启用沉默规则的【忽略类型】配置
+        elif user.get_silence_ignore_type(event):  # 判断用户是否启用沉默规则的【忽略类型】配置
             logger.info('{{"u_id":"{0}","action":"Silence rule is enable, user {1} removed from the sender list"}}'''
                         .format(user.id, user.username))
             continue
